@@ -1,361 +1,493 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MineraPay Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{--bg:#f5f7fb;--card:#ffffff;--accent:#0b5cff;--muted:#6b7280;--dark:#0f1724;--light:#f8fafc;--success:#16a34a;--error:#dc2626}
-    html,body{height:100%;margin:0;font-family:'Inter','Poppins',sans-serif;background:var(--bg);color:#111}
-    *{transition:background 0.2s ease,color 0.2s ease}
-    .app{display:flex;height:100vh}
-    .sidebar{width:260px;background:linear-gradient(180deg,var(--dark) 0%,#0a0f1a 100%);color:white;padding:24px;box-sizing:border-box;overflow-y:auto;box-shadow:2px 0 12px rgba(0,0,0,0.1)}
-    .brand{font-weight:700;font-size:18px;margin-bottom:4px;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
-    .brand-emoji{font-size:24px}
-    .subtitle{font-size:12px;opacity:0.6;margin-bottom:24px;display:block;font-weight:500}
-    .user-info{background:rgba(255,255,255,0.08);padding:12px;border-radius:12px;margin-bottom:16px;font-size:13px;border-left:3px solid var(--accent)}
-    .user-name{font-weight:600;margin-bottom:4px}
-    .user-role{font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px}
-    .nav{display:flex;flex-direction:column;gap:4px}
-    .nav button{display:block;width:100%;text-align:left;padding:12px 14px;border:none;background:transparent;color:rgba(255,255,255,0.75);border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;transition:all 0.2s ease}
-    .nav button:hover{background:rgba(255,255,255,0.1);color:white}
-    .nav button.active{background:var(--accent);color:white;box-shadow:0 4px 12px rgba(11,92,255,0.3)}
-    .nav button.disabled{opacity:0.5;cursor:not-allowed}
-    .nav button .icon{margin-right:8px}
-    .nav-divider{height:1px;background:rgba(255,255,255,0.1);margin:8px 0}
-    .logout-btn{margin-top:auto;width:100%;padding:12px;background:rgba(220,38,38,0.2);border:1px solid rgba(220,38,38,0.4);color:#fca5a5;border-radius:8px;cursor:pointer;font-weight:500}
-    .logout-btn:hover{background:rgba(220,38,38,0.3)}
-    .change-pwd-btn{width:100%;padding:10px;background:rgba(11,92,255,0.15);border:1px solid rgba(11,92,255,0.3);color:#93c5fd;border-radius:8px;cursor:pointer;font-weight:500;margin-bottom:8px;font-size:13px}
-    .change-pwd-btn:hover{background:rgba(11,92,255,0.25)}
-    .main{flex:1;padding:24px;box-sizing:border-box;overflow-y:auto;background:var(--bg)}
-    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-    .topbar h1{margin:0;font-size:28px;font-weight:700;color:var(--dark)}
-    .topbar .subtitle{font-size:14px;color:var(--muted);margin:0}
-    .card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);margin-bottom:20px;border:1px solid #f0f4f8}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
-    .summary{padding:18px;border-radius:12px;background:linear-gradient(135deg,#eff6ff 0%,#f0f9ff 100%);border:1px solid #e0eef9;transition:all 0.2s ease}
-    .summary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(11,92,255,0.1)}
-    .summary .label{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px}
-    .summary .value{font-size:24px;font-weight:700;color:var(--dark);font-family:'Poppins',sans-serif}
-    label{display:block;font-weight:600;margin-top:12px;color:var(--muted);font-size:13px}
-    input[type=text],input[type=password],textarea,select{width:100%;padding:11px;margin-top:6px;border:1px solid #e6eef8;border-radius:8px;font-size:13px;font-family:inherit}
-    input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,92,255,0.1);background:#f9fcff}
-    .controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-    button.primary{background:linear-gradient(135deg,var(--accent),#2563eb);color:white;border:none;padding:11px 18px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;transition:all 0.2s ease}
-    button.primary:hover{opacity:0.95;transform:translateY(-1px);box-shadow:0 4px 12px rgba(11,92,255,0.3)}
-    button.secondary{background:#f0f4f8;color:var(--dark);border:none;padding:11px 18px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px}
-    button.secondary:hover{background:#e0e8f0}
-    .muted{color:var(--muted);font-size:12px}
-    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
-    th,td{padding:12px;border-bottom:1px solid #eef2f7;text-align:left}
-    th{background:#f9fafb;font-weight:700;color:var(--dark)}
-    tbody tr:hover{background:#f9fafb}
-    tbody tr.success-row{border-left:3px solid var(--success)}
-    tbody tr.error-row{border-left:3px solid var(--error)}
-    pre#raw{background:#0b1220;color:#dbeafe;padding:12px;border-radius:8px;max-height:300px;overflow:auto;font-size:12px;line-height:1.4}
-    .small{font-size:13px;color:var(--muted)}
-    section{display:none}
-    section.active{display:block;animation:fadeIn 0.3s ease}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-    .export-btn{margin-top:12px}
-    .toast-container{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:12px;z-index:2000}
-    .toast{min-width:280px;padding:14px 18px;border-radius:12px;color:white;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.15);opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s ease;font-size:13px}
-    .toast-info{background:linear-gradient(135deg,#0b5cff,#2563eb)}
-    .toast-success{background:linear-gradient(135deg,var(--success),#15803d)}
-    .toast-error{background:linear-gradient(135deg,var(--error),#991b1b)}
-    .modal{position:fixed;inset:0;background:rgba(15,23,36,0.8);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease}
-    .modal.show{opacity:1;visibility:visible}
-    .modal-content{background:linear-gradient(180deg,#eff6ff,#ffffff);border:1px solid rgba(59,130,246,0.18);padding:28px;border-radius:16px;box-shadow:0 20px 60px rgba(15,23,36,0.2);max-width:420px;width:100%;transform:translateY(24px);transition:transform .25s ease}
-    .modal.show .modal-content{transform:translateY(0)}
-    .modal-content button{margin-top:16px}
-    .modal-title{font-size:18px;font-weight:700;margin-bottom:16px;color:var(--dark)}
-    .status-badge{display:inline-block;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
-    .status-klop{background:rgba(22,163,74,0.2);color:var(--success)}
-    .status-error{background:rgba(220,38,38,0.2);color:var(--error)}
-    .history-item{padding:12px;border-left:3px solid #e6eef8;margin-bottom:8px;border-radius:4px;background:#f9fafb}
-    .history-item:hover{background:#f0f4f8}
-    .history-username{font-weight:600;color:var(--dark)}
-    .history-time{font-size:11px;color:var(--muted)}
-    .history-status{margin-top:4px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain Extractor — Premium Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --gold: #d4af37;
+        --gold-light: #f5e6a8;
+        --gold-dark: #a8842c;
+        --bg-dark: #0a0a0f;
+        --bg-card: #12121a;
+        --bg-elevated: #1a1a26;
+        --border: #2a2a3a;
+        --text-primary: #f0f0f5;
+        --text-muted: #8a8a9a;
+        --success: #2ecc71;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg-dark);
+        background-image:
+            radial-gradient(ellipse at top left, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at bottom right, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+        min-height: 100vh;
+        padding: 40px 20px;
+        color: var(--text-primary);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 900px;
+        background: linear-gradient(145deg, var(--bg-card), var(--bg-elevated));
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.6),
+            0 0 0 1px rgba(212, 175, 55, 0.1) inset;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* === HEADER === */
+    .header {
+        text-align: center;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+        display: inline-block;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--gold);
+        padding: 6px 16px;
+        border: 1px solid var(--gold-dark);
+        border-radius: 100px;
+        margin-bottom: 16px;
+        background: rgba(212, 175, 55, 0.05);
+    }
+
+    h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 34px;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+    }
+
+    .subtitle {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 300;
+    }
+
+    /* === INPUT AREA === */
+    .input-group { margin-bottom: 20px; }
+
+    label {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    textarea {
+        width: 100%;
+        height: 180px;
+        padding: 16px 18px;
+        background: #0d0d14;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.7;
+        resize: vertical;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+
+    textarea:focus {
+        border-color: var(--gold-dark);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+
+    textarea::placeholder { color: #55556a; }
+
+    /* === BUTTONS === */
+    .btn-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    button {
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        padding: 13px 24px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: #0a0a0f;
+        flex: 1;
+        justify-content: center;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--gold-dark);
+        color: var(--gold);
+    }
+
+    .btn-secondary.copied {
+        background: rgba(46, 204, 113, 0.15);
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    /* === RESULT TABLE === */
+    .result-section {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .result-section.show { display: block; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .result-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 20px;
+        color: var(--gold);
+    }
+
+    .result-count {
+        font-size: 12px;
+        color: var(--text-muted);
+        padding: 4px 12px;
+        border: 1px solid var(--border);
+        border-radius: 100px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    thead th {
+        background: linear-gradient(135deg, #1f1f2e, #16161f);
+        color: var(--gold-light);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        padding: 14px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+    }
+
+    thead th:first-child { width: 70px; text-align: center; }
+    thead th:last-child { text-align: center; }
+
+    tbody td {
+        padding: 13px 16px;
+        font-size: 14px;
+        border-bottom: 1px solid rgba(42, 42, 58, 0.5);
+        transition: background 0.2s ease;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    tbody tr:hover td { background: rgba(212, 175, 55, 0.04); }
+
+    tbody td:first-child {
+        text-align: center;
+        font-weight: 600;
+        color: var(--gold);
+        background: rgba(212, 175, 55, 0.06);
+        font-family: 'Playfair Display', serif;
+        font-size: 16px;
+    }
+
+    tbody td:last-child { text-align: center; }
+
+    tbody a {
+        color: #8ab4f8;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 13px;
+        transition: color 0.2s;
+        word-break: break-all;
+    }
+
+    tbody a:hover {
+        color: var(--gold-light);
+        text-decoration: underline;
+    }
+
+    /* === TOAST === */
+    .toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: #0a0a0f;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 10px 40px rgba(212, 175, 55, 0.4);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 600px) {
+        .container { padding: 24px 18px; }
+        h1 { font-size: 24px; }
+        .btn-row { flex-direction: column; }
+        button { width: 100%; }
+        thead th:first-child { width: 50px; }
+        tbody td { padding: 10px 8px; font-size: 12px; }
+        tbody a { font-size: 11px; }
+    }
+
+    /* === SCROLLBAR === */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
+</style>
 </head>
 <body>
-  <!-- LOGIN PAGE -->
-  <div id="loginPage" style="display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0b5cff 0%,#2563eb 100%);position:fixed;inset:0;z-index:5000">
-    <div style="background:white;padding:32px;border-radius:16px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-      <div style="text-align:center;margin-bottom:24px">
-        <div style="font-size:40px;margin-bottom:8px">📊</div>
-        <h1 style="margin:0;font-size:24px;font-weight:700;color:var(--dark)">MineraPay</h1>
-        <p style="margin:4px 0 0 0;color:var(--muted);font-size:13px">Balance & Withdraw Dashboard</p>
-      </div>
-      
-      <div id="backendStatus" style="background:#eff6ff;border:1px solid #bfdbfe;padding:12px;border-radius:8px;margin-bottom:16px;font-size:12px;text-align:center;color:#1e40af">
-        ℹ️ Cek koneksi backend...
-      </div>
-      
-      <label style="margin-top:0">Username</label>
-      <input id="loginUsername" type="text" placeholder="Masukkan username">
-      <label>Password</label>
-      <input id="loginPassword" type="password" placeholder="Masukkan password">
-      <button class="primary" style="width:100%;margin-top:16px" onclick="handleLogin()">Login</button>
-      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:16px">
-      </p>
+
+<div class="container">
+    <div class="header">
+        <div class="badge">TOPANBOS88</div>
+        <h1>Domain Extractor</h1>
+        <p class="subtitle">Ekstrak Data Dari Web CARIKAN.ID > Paste Data Ke Doc</p>
     </div>
-  </div>
 
-  <!-- MAIN APP -->
-  <div class="app" style="display:none" id="mainApp">
-    <aside class="sidebar">
-      <div class="brand">
-        <span class="brand-emoji">📊</span>
-        <span>MineraPay</span>
-      </div>
-      <span class="subtitle">Balance Monitoring</span>
-      
-      <div class="user-info">
-        <div class="user-name" id="sidebarUsername">-</div>
-        <div class="user-role" id="sidebarUserRole">-</div>
-      </div>
-
-      <button class="change-pwd-btn" onclick="showChangePasswordModal()">🔐 Ubah Password</button>
-
-      <nav class="nav">
-        <button id="nav-dashboard" class="active" onclick="showSection('overview')"><span class="icon">📈</span>Overview</button>
-        <button id="nav-withdraws" onclick="showSection('withdraws')"><span class="icon">💳</span>Withdraws</button>
-        <button id="nav-history" onclick="showSection('history')"><span class="icon">⏱️</span>History Check</button>
-        <button id="nav-settings" onclick="showSection('settings')"><span class="icon">⚙️</span>Settings</button>
-      </nav>
-
-      <div class="nav-divider"></div>
-
-      <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
-    </aside>
-    <main class="main">
-      <!-- OVERVIEW SECTION -->
-      <section id="overview" class="active">
-        <div class="topbar">
-          <div>
-            <h1>Overview</h1>
-            <div class="small">Ringkasan balance dan withdraw Anda</div>
-          </div>
-          <div><button id="toggleRawBtn" class="secondary">👁️ Toggle Raw Response</button></div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight:600;margin-bottom:12px;color:var(--muted);text-transform:uppercase;font-size:12px;letter-spacing:0.5px">Summary Balance</div>
-          <div class="grid">
-            <div class="summary">
-              <div class="label">Active Balance</div>
-              <div class="value" id="active">-</div>
-            </div>
-            <div class="summary">
-              <div class="label">Pending Balance</div>
-              <div class="value" id="pending">-</div>
-            </div>
-            <div class="summary">
-              <div class="label">Total Balance</div>
-              <div class="value" id="totalBalance">-</div>
-            </div>
-            <div class="summary">
-              <div class="label">Total Withdraw</div>
-              <div class="value" id="totalWithdraw">-</div>
-            </div>
-            <div class="summary">
-              <div class="label">Total Fee</div>
-              <div class="value" id="totalFee">-</div>
-            </div>
-            <div class="summary">
-              <div class="label">Saldo Manual</div>
-              <div class="value" id="manualBalanceDisplay">-</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight:700;font-size:16px;margin-bottom:16px">Withdraw Summary</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:16px;flex-wrap:wrap">
-            <div>
-              <span class="small">Status Rekonsiliasi: </span>
-              <strong id="reconcileStatus" style="font-size:14px">-</strong>
-              <span id="reconciledBadge" style="margin-left:8px"></span>
-            </div>
-            <div><span class="small">Last check: </span><strong id="lastCheck">-</strong></div>
-          </div>
-          <div id="statusDetails" class="small" style="margin-bottom:12px;color:#0b5cff"></div>
-          <pre id="withdrawSummary" class="small" style="background:var(--light);padding:12px;border-radius:8px;margin:0">-</pre>
-        </div>
-
-        <div id="rawCard" class="card" style="display:none">
-          <div style="font-weight:700;margin-bottom:12px">Debug: Raw Response</div>
-          <pre id="raw"></pre>
-        </div>
-      </section>
-
-      <!-- WITHDRAWS SECTION -->
-      <section id="withdraws">
-        <div class="topbar">
-          <div>
-            <h1>Withdraws</h1>
-            <div class="small">Daftar semua transaksi withdraw</div>
-          </div>
-          <div><button id="exportBtn" class="primary">💾 Export CSV</button></div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-            <div style="font-weight:700;font-size:14px">Ringkasan</div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <label class="small" for="statusFilter" style="margin:0">Filter Status</label>
-              <select id="statusFilter" style="max-width:180px">
-                <option value="all">Semua</option>
-                <option value="success">Sukses</option>
-                <option value="pending">Pending</option>
-              </select>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
-            <div class="summary">
-              <div class="label">Total Form</div>
-              <div class="value" id="wd-count">0</div>
-            </div>
-            <div class="summary">
-              <div class="label">Total Amount</div>
-              <div class="value" id="wd-amount">0</div>
-            </div>
-            <div class="summary">
-              <div class="label">Total Fee</div>
-              <div class="value" id="wd-fee">0</div>
-            </div>
-            <div class="summary">
-              <div class="label">Amount > 10M</div>
-              <div class="value" id="wd-amountgt">0 (0)</div>
-            </div>
-            <div class="summary">
-              <div class="label">Amount ≤ 10M</div>
-              <div class="value" id="wd-amountlt">0 (0)</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight:700;font-size:14px;margin-bottom:12px">Daftar Withdraw Detail</div>
-          <div id="withdrawTableWrapper" style="overflow-x:auto">
-            <div class="small">Gunakan tombol Simpan atau tunggu auto-check untuk memuat data.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- HISTORY CHECK SECTION -->
-      <section id="history">
-        <div class="topbar">
-          <div>
-            <h1>History Check</h1>
-            <div class="small">Riwayat pemeriksaan balance</div>
-          </div>
-          <div id="adminHistoryControls" style="display:none">
-            <button class="secondary" onclick="clearAllHistory()" style="background:#fee2e2;color:#991b1b">🗑️ Clear All History</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <label style="margin-top:0">
-            <input type="checkbox" id="autoCheckToggle"> 
-            <span style="margin-left:8px">Enable Auto-Check setiap 10 menit</span>
-          </label>
-        </div>
-
-        <div class="card">
-          <div style="font-weight:700;margin-bottom:16px">Recent Checks</div>
-          <div id="historyList" style="max-height:600px;overflow-y:auto">
-            <div class="small" style="text-align:center;color:var(--muted);padding:24px">📭 Belum ada history</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SETTINGS SECTION -->
-      <section id="settings">
-        <div class="topbar">
-          <div>
-            <h1>Settings</h1>
-            <div class="small">Konfigurasi endpoint dan path API</div>
-          </div>
-        </div>
-
-        <div class="card" style="max-width:900px">
-          <div style="font-weight:700;font-size:14px;margin-bottom:16px">Balance Endpoint</div>
-          <label for="endpoint">Endpoint URL</label>
-          <input id="endpoint" value="https://api-service.minerapay.com/v1/merchant/balance">
-          
-          <label for="auth">Authorization Header (optional)</label>
-          <input id="auth" value="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJlbmR5a3Vyc21iODhAZ21haWwuY29tIiwic3ViIjoiYzVmYTZjMzYtMjNhOC00MTBiLTllMzEtMmM5NmUyMDZmMzhhIiwiaWF0IjoxNzgxOTU5MzMwLCJleHAiOjE3ODIwNDU3MzB9.Er670YaqfR0mfLk6IpzB54ZAaWA2mNF6kmxVUND4Xog">
-
-          <label for="pathActive">Path ke Active Balance (dot notation)</label>
-          <input id="pathActive" value="data.active" placeholder="contoh: data.active">
-
-          <label for="pathPending">Path ke Pending Balance</label>
-          <input id="pathPending" value="data.pending" placeholder="contoh: data.pending">
-
-          <label for="startDate">Start Date / Time</label>
-          <input id="startDate" type="datetime-local">
-
-          <label for="endDate">End Date / Time</label>
-          <input id="endDate" type="datetime-local">
-
-          <label for="refreshInterval">Auto-refresh interval (seconds)</label>
-          <input id="refreshInterval" type="number" min="10" step="1" value="600">
-
-          <label for="manualBalance">Saldo Manual (input dari settings)</label>
-          <input id="manualBalance" type="number" min="0" step="1000" placeholder="Masukkan saldo manual">
-
-          <hr style="margin:20px 0;border:none;border-top:1px solid #e6eef8">
-
-          <div style="font-weight:700;font-size:14px;margin-bottom:16px">Withdraw Endpoint</div>
-          <label for="withdrawEndpoint">Endpoint URL</label>
-          <input id="withdrawEndpoint" value="https://api-service.minerapay.com/v2/transaction?type=WITHDRAW&cursor=2026-06-21T02:04:33%2B07:00&limit=25&start_date=2026-06-20T17:00:00.000Z&end_date=2026-06-21T16:59:59.999Z">
-
-          <label for="withdrawListPath">Path ke List Withdraw</label>
-          <input id="withdrawListPath" value="data" placeholder="contoh: data atau data.withdraws">
-
-          <label for="withdrawAmountPath">Path ke Field Nominal</label>
-          <input id="withdrawAmountPath" value="amount" placeholder="contoh: amount">
-
-          <div class="controls export-btn">
-            <button id="saveSettings" class="primary">💾 Simpan & Check</button>
-            <button id="copyAutodetect" class="secondary">📋 Copy Auto-Detect</button>
-          </div>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- MODALS -->
-  <div id="toastContainer" class="toast-container"></div>
-
-  <div id="popupModal" class="modal">
-    <div class="modal-content">
-      <div id="popupMessage" style="font-size:15px;color:#111;white-space:pre-wrap;text-align:left"></div>
-      <button id="popupClose" class="primary">OK</button>
+    <div class="input-group">
+        <label>Tempel Data Mentah</label>
+        <textarea id="inputData" placeholder="Tempel teks di sini...&#10;&#10;Contoh:&#10;01&#10;gopath.id&#10;https://gopath.id/link_topanbos88&#10;..."></textarea>
     </div>
-  </div>
 
-  <div id="changePasswordModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title">🔐 Ubah Password</div>
-      <label for="oldPassword">Password Lama</label>
-      <input id="oldPassword" type="password" placeholder="Masukkan password lama">
-      <label for="newPassword">Password Baru</label>
-      <input id="newPassword" type="password" placeholder="Masukkan password baru">
-      <label for="confirmPassword">Konfirmasi Password</label>
-      <input id="confirmPassword" type="password" placeholder="Konfirmasi password baru">
-      <div style="display:flex;gap:10px;margin-top:20px">
-        <button class="primary" style="flex:1" onclick="handleChangePassword()">Ubah</button>
-        <button class="secondary" style="flex:1" onclick="hideChangePasswordModal()">Batal</button>
-      </div>
+    <div class="btn-row">
+        <button class="btn-primary" onclick="prosesData()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            Proses Data
+        </button>
+        <button class="btn-secondary" onclick="clearAll()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Bersihkan
+        </button>
     </div>
-  </div>
 
-  <script src="app.js"></script>
+    <div class="result-section" id="resultSection">
+        <div class="result-header">
+            <div class="result-title">Hasil Ekstraksi</div>
+            <div class="result-count" id="resultCount">0 domain</div>
+        </div>
+
+        <div class="btn-row" style="margin-bottom:16px;">
+            <button class="btn-secondary" id="btnCopyTable" onclick="copyTable()" style="flex:1; justify-content:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy Tabel (Spreadsheet)
+            </button>
+            <button class="btn-secondary" id="btnCopyLinks" onclick="copyLinks()" style="flex:1; justify-content:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                Copy Link Saja
+            </button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Domain Link</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyHasil"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="toast" id="toast">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastMsg">Berhasil disalin!</span>
+</div>
+
+<script>
+    let hasilData = [];
+
+    function prosesData() {
+        const input = document.getElementById('inputData').value;
+        const lines = input.split('\n');
+        hasilData = [];
+        let counter = 1;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line.startsWith('http://') || line.startsWith('https://')) {
+                hasilData.push({ no: counter++, link: line });
+            }
+        }
+
+        renderTable();
+        document.getElementById('resultCount').textContent = hasilData.length + ' domain';
+        document.getElementById('resultSection').classList.add('show');
+
+        if (hasilData.length === 0) {
+            showToast('Tidak ada link ditemukan');
+        } else {
+            showToast(hasilData.length + ' domain berhasil diekstrak');
+        }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tbodyHasil');
+        tbody.innerHTML = '';
+        hasilData.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.no}</td>
+                <td><a href="${item.link}" target="_blank" rel="noopener">${item.link}</a></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function copyTable() {
+        if (hasilData.length === 0) return showToast('Belum ada data');
+        const text = hasilData.map(i => `${i.no}\t${i.link}`).join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+            flashButton('btnCopyTable', 'Tersalin!');
+            showToast('Tabel siap tempel ke spreadsheet');
+        });
+    }
+
+    function copyLinks() {
+        if (hasilData.length === 0) return showToast('Belum ada data');
+        const text = hasilData.map(i => i.link).join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+            flashButton('btnCopyLinks', 'Tersalin!');
+            showToast('Daftar link berhasil disalin');
+        });
+    }
+
+    function flashButton(id, msg) {
+        const btn = document.getElementById(id);
+        const original = btn.innerHTML;
+        btn.classList.add('copied');
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${msg}`;
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = original;
+        }, 2000);
+    }
+
+    function clearAll() {
+        document.getElementById('inputData').value = '';
+        document.getElementById('resultSection').classList.remove('show');
+        document.getElementById('tbodyHasil').innerHTML = '';
+        hasilData = [];
+        showToast('Data dibersihkan');
+    }
+
+    let toastTimeout;
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+</script>
+
 </body>
 </html>
